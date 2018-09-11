@@ -1,0 +1,30 @@
+{
+  "name": "a-slice-of-elm-beta",
+  "version": "1.0.0",
+  "description": "This repository is intended to provide the Elm beginner and intermediate with a playground for exploring different parts of Elm in the context of a working application.",
+  "main": "elm.js",
+  "dependencies" : {
+    "elm" : "0.18.*",
+    "elm-test" : "0.18.*",
+    "elm-format" : "0.7.0-exp"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "postinstall": "elm-package install --yes",
+    "build": "elm-make --debug --output elm.js src/Main.elm",
+    "start" : "elm-reactor",
+    "test": "elm-test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madsflensted/a-slice-of-elm-beta.git"
+  },
+  "author": "Mads Flensted-Urech",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/madsflensted/a-slice-of-elm-beta/issues"
+  },
+  "homepage": "https://github.com/madsflensted/a-slice-of-elm-beta#readme"
+}

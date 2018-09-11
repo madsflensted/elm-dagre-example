@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/assets/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Main</title>
+    <script type="text/javascript" src="/elm.js"></script>
+    <script type="text/javascript" src="/assets/dagre.min.js"></script>
+  <head>
+  <body>
+    <script type="text/javascript">
+      //var dagre = require("dagre"); 
+
+      var app = Elm.Main.fullscreen();
+
+      app.ports.layout.subscribe((data) => {
+        //console.log(data);
+
+        var g = dagre.graphlib.json.read(JSON.parse(data));
+
+        dagre.layout(g);
+
+        //console.dir(g.graph());
+
+        var graph = dagre.graphlib.json.write(g);
+
+        //console.dir(graph);
+
+        app.ports.graphs.send(graph);
+      });
+    </script>
+  </body>
+</html>
