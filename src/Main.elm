@@ -1,22 +1,23 @@
 port module Main exposing (main)
 
+import Browser
 import Decoder exposing (decodeGraph)
 import Encoder exposing (graphToJsonStr)
-import Html
+import Json.Decode exposing (errorToString)
 import Json.Encode exposing (Value)
 import Process
 import Task
 import TestGraph
-import Time
 import Types exposing (..)
 import View exposing (view)
+
 
 
 -- Init
 
 
-init : ( Model, Cmd msg )
-init =
+init : () -> ( Model, Cmd msg )
+init _ =
     let
         model =
             Model Nothing TestGraph.data 0
@@ -35,7 +36,7 @@ update message model =
             ( { model | editor = str, layoutRequested = model.layoutRequested + 1 }
             , Task.perform
                 (\_ -> Layout)
-                (Process.sleep (1 * Time.second))
+                (Process.sleep (1.0 * 1000))
             )
 
         Graph data ->
@@ -46,7 +47,7 @@ update message model =
                             Just g
 
                         Err e ->
-                            Debug.log ("Decode failed" ++ e) Nothing
+                            Debug.log ("Decode failed" ++ errorToString e) Nothing
             in
             ( { model | graph = graph }, Cmd.none )
 
@@ -55,15 +56,20 @@ update message model =
                 outstanding =
                     if model.layoutRequested > 0 then
                         model.layoutRequested - 1
+
                     else
                         0
             in
             ( { model | layoutRequested = model.layoutRequested - 1 }
             , if outstanding > 0 then
                 Cmd.none
+
               else
                 layout (graphToJsonStr model.editor)
             )
+
+        NoOp ->
+            ( model, Cmd.none )
 
 
 
@@ -89,9 +95,9 @@ subscriptions model =
 -- Main
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
+    Browser.document
         { init = init
         , view = view
         , update = update

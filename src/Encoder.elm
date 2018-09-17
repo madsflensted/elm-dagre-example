@@ -2,7 +2,7 @@ module Encoder exposing (graphToJsonStr)
 
 import GraphParser
 import Json.Encode exposing (Value, bool, encode, float, int, list, object, string)
-import Parser exposing (Error)
+import Parser exposing (DeadEnd)
 import Types exposing (..)
 
 
@@ -17,7 +17,7 @@ graphToJsonStr str =
             ]
 
 
-parsed : String -> List (Result Error Entry)
+parsed : String -> List (Result (List DeadEnd) Entry)
 parsed str =
     GraphParser.parse str
 
@@ -51,7 +51,7 @@ jsonEdge a b l w h =
         ]
 
 
-nodeToJson : Result Error Entry -> Maybe Value
+nodeToJson : Result (List DeadEnd) Entry -> Maybe Value
 nodeToJson n =
     case n of
         Ok (N a l) ->
@@ -61,7 +61,7 @@ nodeToJson n =
             Nothing
 
 
-edgeToJson : Result Error Entry -> Maybe Value
+edgeToJson : Result (List DeadEnd) Entry -> Maybe Value
 edgeToJson e =
     case e of
         Ok (E a b l) ->
@@ -93,9 +93,9 @@ jsonGraphValues =
 
 nodesJson : String -> Value
 nodesJson str =
-    list (List.filterMap nodeToJson <| parsed str)
+    list identity (List.filterMap nodeToJson <| parsed str)
 
 
 edgesJson : String -> Value
 edgesJson str =
-    list (List.filterMap edgeToJson <| parsed str)
+    list identity (List.filterMap edgeToJson <| parsed str)

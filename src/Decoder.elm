@@ -1,18 +1,18 @@
 module Decoder exposing (decodeGraph)
 
-import Json.Decode exposing (Decoder, Value, bool, decodeValue, float, int, list, string)
-import Json.Decode.Pipeline exposing (custom, decode, optional, required)
+import Json.Decode exposing (Decoder, Error, Value, bool, decodeValue, float, int, list, string, succeed)
+import Json.Decode.Pipeline exposing (custom, optional, required)
 import Types exposing (..)
 
 
-decodeGraph : Value -> Result String GraphData
+decodeGraph : Value -> Result Error GraphData
 decodeGraph json =
     decodeValue graphData json
 
 
 graphData : Decoder GraphData
 graphData =
-    decode GraphData
+    succeed GraphData
         |> required "options" graphOptions
         |> required "value" graphValues
         |> required "nodes" (list node)
@@ -21,7 +21,7 @@ graphData =
 
 graphOptions : Decoder GraphOptions
 graphOptions =
-    decode GraphOptions
+    succeed GraphOptions
         |> required "directed" bool
         |> required "multigraph" bool
         |> required "compound" bool
@@ -29,7 +29,7 @@ graphOptions =
 
 graphValues : Decoder GraphValues
 graphValues =
-    decode GraphValues
+    succeed GraphValues
         |> required "nodesep" int
         |> required "ranksep" int
         |> required "rankdir" string
@@ -41,14 +41,14 @@ graphValues =
 
 node : Decoder Node
 node =
-    decode Node
+    succeed Node
         |> required "v" string
         |> required "value" nodeValue
 
 
 nodeValue : Decoder NodeValue
 nodeValue =
-    decode NodeValue
+    succeed NodeValue
         |> required "label" string
         |> required "height" int
         |> required "width" int
@@ -58,7 +58,7 @@ nodeValue =
 
 edge : Decoder Edge
 edge =
-    decode Edge
+    succeed Edge
         |> required "v" string
         |> required "w" string
         |> required "value" edgeValue
@@ -66,7 +66,7 @@ edge =
 
 edgeValue : Decoder EdgeValue
 edgeValue =
-    decode EdgeValue
+    succeed EdgeValue
         |> required "label" string
         |> required "height" int
         |> required "width" int
@@ -77,6 +77,6 @@ edgeValue =
 
 point : Decoder Point
 point =
-    decode Point
+    succeed Point
         |> required "x" float
         |> required "y" float

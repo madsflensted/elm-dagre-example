@@ -3,4 +3,5 @@ elm.js
 node_modules
 setup.sh
 Makefile
+elm-upgrade-*
 .envrc

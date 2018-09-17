@@ -3,16 +3,17 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="/assets/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <title>Main</title>
     <script type="text/javascript" src="/elm.js"></script>
     <script type="text/javascript" src="/assets/dagre.min.js"></script>
   <head>
   <body>
+    <div id="elm"></div>
     <script type="text/javascript">
-      //var dagre = require("dagre"); 
+      //var dagre = require("dagre");
 
-      var app = Elm.Main.fullscreen();
+      var app = Elm.Main.init({
+        node: document.getElementById("elm")
+      });
 
       app.ports.layout.subscribe((data) => {
         //console.log(data);

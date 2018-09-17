@@ -1,4 +1,4 @@
-module Types exposing (..)
+module Types exposing (Edge, EdgeValue, Entry(..), GraphData, GraphOptions, GraphValues, Model, Msg(..), Node, NodeValue, Point)
 
 import Json.Encode exposing (Value)
 
@@ -7,6 +7,7 @@ type Msg
     = Edit String
     | Graph Value
     | Layout
+    | NoOp
 
 
 type alias Model =

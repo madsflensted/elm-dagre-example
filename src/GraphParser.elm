@@ -5,7 +5,7 @@ import Parser exposing (..)
 import Types exposing (..)
 
 
-parse : String -> List (Result Error Entry)
+parse : String -> List (Result (List DeadEnd) Entry)
 parse str =
     str
         |> String.lines
@@ -15,8 +15,7 @@ parse str =
 parseLine : Parser Entry
 parseLine =
     oneOf
-        [ parseEdge
-        , parseNode
+        [ parseNodeOrEdge
         , parseComment
         , parseBlank
         ]
@@ -27,7 +26,9 @@ parseComment =
     succeed C
         |. symbol "#"
         |. spaces
-        |= keep zeroOrMore (\_ -> True)
+        |= (getChompedString <|
+                (succeed () |. chompUntilEndOr "\n")
+           )
         |. end
 
 
@@ -48,32 +49,62 @@ parseBlank =
 -}
 
 
-parseNode : Parser Entry
-parseNode =
-    delayedCommitMap N parseName <|
-        succeed identity
-            |. symbol ":"
-            |. spaces
-            |= keep oneOrMore isLabelChar
+parseNodeOrEdge : Parser Entry
+parseNodeOrEdge =
+    succeed addFirstName
+        |. spaces
+        |= parseName
+        |. spaces
+        |= (oneOf
+                [ succeed True |. symbol ":"
+                , succeed False |. symbol "->"
+                ]
+                |> andThen
+                    (\v ->
+                        if v then
+                            succeed (\l -> N "" l)
+                                |. spaces
+                                |= parseLabel
+                                |. spaces
+
+                        else
+                            succeed (\n2 l -> E "" n2 l)
+                                |. spaces
+                                |= parseName
+                                |. spaces
+                                |. symbol ":"
+                                |. spaces
+                                |= parseLabel
+                                |. spaces
+                    )
+           )
 
 
-parseEdge : Parser Entry
-parseEdge =
-    delayedCommitMap (\a ( b, c ) -> E a b c) parseName <|
-        succeed (,)
-            |. symbol "->"
-            |. spaces
-            |= keep oneOrMore isNameChar
-            |. spaces
-            |. symbol ":"
-            |. spaces
-            |= keep oneOrMore isLabelChar
+addFirstName : String -> Entry -> Entry
+addFirstName n e =
+    case e of
+        N _ l ->
+            N n l
+
+        E _ n2 l ->
+            E n n2 l
+
+        x ->
+            x
+
+
+parseLabel : Parser String
+parseLabel =
+    getChompedString <|
+        succeed ()
+            |. chompWhile isLabelChar
 
 
 parseName : Parser String
 parseName =
-    keep oneOrMore isNameChar
-        |. spaces
+    getChompedString <|
+        succeed ()
+            |. chompWhile isNameChar
 
 
 isNameChar : Char -> Bool
@@ -94,4 +125,5 @@ isLabelChar char =
 
 spaces : Parser ()
 spaces =
-    ignore zeroOrMore (\c -> c == ' ')
+    succeed ()
+        |. chompWhile (\c -> c == ' ')
